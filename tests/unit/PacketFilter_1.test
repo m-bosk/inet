@@ -1,0 +1,57 @@
+%description:
+Test for packet filtering.
+
+%includes:
+#include "inet/common/packet/Packet.h"
+#include "inet/common/packet/PacketFilter.h"
+#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include "inet/transportlayer/udp/UdpHeader_m.h"
+
+using namespace omnetpp;
+using namespace inet;
+
+#define TEST(CONDITION, PACKET) filter.setPattern(CONDITION, ""); std::cout << #PACKET << " : " << CONDITION << " -> " << (filter.matches(&PACKET) ? "true" : "false") << std::endl;
+
+%activity:
+
+Packet packet1;
+packet1.setName("P1");
+auto ipv4Header = makeShared<Ipv4Header>();
+ipv4Header->setProtocolId(IP_PROT_UDP);
+ipv4Header->setDestAddress(Ipv4Address("10.0.0.1"));
+packet1.insertAtBack(ipv4Header);
+auto udpHeader = makeShared<UdpHeader>();
+udpHeader->setTotalLengthField(B(100 + 8));
+udpHeader->setDestPort(42);
+packet1.insertAtBack(udpHeader);
+packet1.insertAtBack(makeShared<ByteCountChunk>(B(100)));
+packet1.addTag<PacketProtocolTag>()->setProtocol(&Protocol::ipv4);
+
+PacketFilter filter;
+
+TEST("pk.name == 'P1'", packet1);
+TEST("pk.totalLength == 128B", packet1);
+TEST("pk.ipv4 != null", packet1);
+TEST("pk.ethernetmac == null", packet1);
+TEST("ipv4.destAddress == '10.0.0.1'", packet1);
+TEST("ipv4[0].destAddress == '10.0.0.1'", packet1);
+TEST("Ipv4Header.destAddress == '10.0.0.1'", packet1);
+TEST("Ipv4Header[0].destAddress == '10.0.0.1'", packet1);
+TEST("udp.destPort == 42", packet1);
+TEST("udp[0].destPort == 42", packet1);
+TEST("UdpHeader.destPort == 42", packet1);
+TEST("UdpHeader[0].destPort == 42", packet1);
+
+%contains: stdout
+packet1 : pk.name == 'P1' -> true
+packet1 : pk.totalLength == 128B -> true
+packet1 : pk.ipv4 != null -> true
+packet1 : pk.ethernetmac == null -> true
+packet1 : ipv4.destAddress == '10.0.0.1' -> true
+packet1 : ipv4[0].destAddress == '10.0.0.1' -> true
+packet1 : Ipv4Header.destAddress == '10.0.0.1' -> true
+packet1 : Ipv4Header[0].destAddress == '10.0.0.1' -> true
+packet1 : udp.destPort == 42 -> true
+packet1 : udp[0].destPort == 42 -> true
+packet1 : UdpHeader.destPort == 42 -> true
+packet1 : UdpHeader[0].destPort == 42 -> true
