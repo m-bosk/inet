@@ -126,6 +126,14 @@ void ZCoordFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject 
         fire(this, t, ((Coord *)wrapper->getObject())->z, details);
 }
 
+Register_ResultFilter("packetDuration", PacketDurationFilter);
+
+void PacketDurationFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object, cObject *details)
+{
+    auto packet = check_and_cast<Packet *>(object);
+    fire(this, t, packet->getDuration(), details);
+}
+
 Register_ResultFilter("sourceAddr", MessageSourceAddrFilter);
 
 void MessageSourceAddrFilter::receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object, cObject *details)
@@ -138,6 +146,14 @@ void MessageSourceAddrFilter::receiveSignal(cResultFilter *prev, simtime_t_cref 
             fire(this, t, addresses->getSrcAddress().str().c_str(), details);
         }
     }
+}
+
+Register_ResultFilter("utilization", UtilizationFilter);
+
+bool UtilizationFilter::process(simtime_t& t, double& value, cObject *details)
+{
+    // TODO:
+    return true;
 }
 
 Register_ResultFilter("throughput", ThroughputFilter);
