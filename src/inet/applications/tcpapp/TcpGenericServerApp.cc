@@ -150,7 +150,7 @@ void TcpGenericServerApp::handleMessage(cMessage *msg)
 
 void TcpGenericServerApp::refreshDisplay() const
 {
-    char buf[64];
+    char buf[128];
     sprintf(buf, "rcvd: %ld pks %ld bytes\nsent: %ld pks %ld bytes", msgsRcvd, bytesRcvd, msgsSent, bytesSent);
     getDisplayString().setTagArg("t", 0, buf);
 }
